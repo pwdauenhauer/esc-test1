@@ -1,0 +1,20 @@
+import json
+import urllib3
+
+def lambda_handler(event, context):
+    # TODO implement
+    a = int(json.dumps(event["key1"]))
+    a = a*3
+    payload = json.dumps({"seriesid":["WPU03THRU15"]})
+    http = urllib3.PoolManager()
+    #req = http.request('GET', 'https://jsonplaceholder.typicode.com/todos/2')
+    req = http.request('POST', 'https://api.bls.gov/publicAPI/v2/timeseries/data', headers={'Content-Type': 'application/json'}, body=payload)
+    res=json.loads(req.data)
+    i1value =  res["Results"]["series"][0]["data"]
+    i2value = list(filter(lambda x: x["year"] == "2019", i1value))
+    i3value = list(filter(lambda x: x["period"] == "M11", i2value))
+    print(i3value[0]["value"])
+    return {
+        'statusCode': 200,
+        'body': i3value[0]["value"]
+    }
